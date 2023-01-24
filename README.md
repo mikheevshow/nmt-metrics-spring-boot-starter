@@ -1,40 +1,50 @@
-# JVM NMT Metrics Spring Boot Starter
+# NMT Metrics Spring Boot Starter
 
-Starter provides metrics of jvm native memory consumption
+The Native Memory Tracking (NMT) is a Java HotSpot VM feature that tracks internal memory usage for a HotSpot JVM. 
+You can access NMT data using `jcmd` utility.
 
-## Quick Start
+## 1. NMT Metrics Motivation
 
-1. Add dependency to your project
+One common case of NMT using is detecting memory leaks.
 
-Gradle (Gradle DSL)
 
-``` gradle
-dependencies {
-    implementation 'com.github.mikheevshow:jvm-nmt-metrics-spring-boot-starter:<<current_version>>'
-}
+
+## 2. Quick Start
+
+### 2.1. Exposing Prometheus endpoint
+
+Make sure to include below dependencies:
+
+```kotlin
+implementation("org.springframework.boot:spring-boot-starter-actuator")
+implementation("io.micrometer:micrometer-registry-prometheus")
+implementation("org.springframework.boot:spring-boot-starter-web")
+
+// And nmt starter dependency
+implementation("com.github.mikheevshow:jvm-nmt-metrics-spring-boot-starter:<<current_version>>")
 ```
 
-Gradle (Koltin DSL)
-``` kotlin
-depencencies {
-  implementation("com.github.mikheevshow:jvm-nmt-metrics-spring-boot-starter:<<current_version>>")
-}
+Configuration:
+```yaml
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 ```
 
-Maven
-``` xml
-<dependencies>
-  <dependency>
-    <groupId>com.github.mikheevshow</groupId>
-    <artifactId>jvm-nmt-metrics-spring-boot-starter</artifactId>
-    <version>current_version</version>
-  </dependecy>
-</dependencies>
-```
+Standard `/actuator/metrics` and `actuator/prometheus` endpoints will render `nmt_*` metrics
 
-2. Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling of NMT adds 5-10% overhead to JVM 
+### 2.2. Enable NMT
+Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling of NMT adds 5-10% overhead to JVM 
 performance.
 
 ```
 -XX:NativeMemoryTracking=summary
 ```
+
+## 3. Metrics List
