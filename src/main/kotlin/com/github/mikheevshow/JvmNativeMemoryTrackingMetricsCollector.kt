@@ -2,6 +2,7 @@ package com.github.mikheevshow
 
 import io.prometheus.client.Collector
 import io.prometheus.client.GaugeMetricFamily
+import org.slf4j.LoggerFactory
 import java.lang.Exception
 
 class JvmNativeMemoryTrackingMetricsCollector(
@@ -9,6 +10,8 @@ class JvmNativeMemoryTrackingMetricsCollector(
     private val parser: JvmNativeMemoryTrackingParser,
     private val nameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions
 ) : Collector() {
+
+    private val log = LoggerFactory.getLogger(JvmNativeMemoryTrackingMetricsCollector::class.java)
 
     override fun collect(): MutableList<MetricFamilySamples> {
         try {
@@ -26,14 +29,17 @@ class JvmNativeMemoryTrackingMetricsCollector(
                             it.value.toString().toDouble()
                         )
                     } catch (ex: Exception) {
-                        // skip non convertable metrics
+                        if (log.isTraceEnabled) {
+                            log.trace("Can't convert the metric with key ${it.key} to double, because value is ${it
+                                .value}", ex)
+                        }
                         null
                     }
                 }
                 .filterNotNull()
                 .toMutableList()
         } catch (ex: Exception) {
-            // log exception
+            log.error("Error when collect nmt metrics", ex)
             return mutableListOf()
         }
     }
