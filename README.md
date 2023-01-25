@@ -61,8 +61,11 @@ Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling
 To investigate memory leaks it's useful to work with `*_kb` metrics. This metrics are exporting from NMT in 
 kilobytes. Use the same unit when create Grafana Dashboard.
 
+<img width="519" alt="grafana-units" src="https://user-images.githubusercontent.com/10999015/214489872-3d3e88d8-2fda-4786-8d6f-fd036a5bdcb2.png">
 
 Using `Time Series` plots with starter's gauges will make diagnostic more visual
+
+<img width="1141" alt="time-series-plot" src="https://user-images.githubusercontent.com/10999015/214489960-f8e62c96-0872-40df-9736-67661d3ccf48.png">
 
 ### 4. License
 
