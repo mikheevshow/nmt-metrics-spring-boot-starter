@@ -35,23 +35,23 @@ class JvmNativeMemoryTrackingParser {
 
             groups = NMT_TOTAL_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "total.reserved", groups[1]!!.value)
-                memory(map, "total.committed", groups[2]!!.value)
+                map.putMemoryValue("total.reserved", groups[1]!!.value)
+                map.putMemoryValue("total.committed", groups[2]!!.value)
                 continue
             }
 
             groups = NMT_SECTION_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
                 section = groups[1]!!.value.slugify()
-                memory(map, "$section.reserved", groups[2]!!.value)
-                memory(map, "$section.committed", groups[3]!!.value)
+                map.putMemoryValue("$section.reserved", groups[2]!!.value)
+                map.putMemoryValue("$section.committed", groups[3]!!.value)
                 continue
             }
 
             groups = NMT_SECTION_MMAP_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "$section.mmap.reserved", groups[1]!!.value)
-                memory(map, "$section.mmap.committed", groups[2]!!.value)
+                map.putMemoryValue("$section.mmap.reserved", groups[1]!!.value)
+                map.putMemoryValue("$section.mmap.committed", groups[2]!!.value)
                 continue
             }
 
@@ -70,7 +70,7 @@ class JvmNativeMemoryTrackingParser {
 
             groups = NMT_MALLOC_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "$section.malloc.allocated", groups[1]!!.value)
+                map.putMemoryValue("$section.malloc.allocated", groups[1]!!.value)
                 map["$section.malloc.allocations"] = groups[2]!!.value
                 continue
             }
@@ -85,29 +85,29 @@ class JvmNativeMemoryTrackingParser {
 
             groups = NMT_STATS_SECTION_MEMORY_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "$section.$innerSection.reserved", groups[1]!!.value)
-                memory(map, "$section.$innerSection.committed", groups[2]!!.value)
+                map.putMemoryValue("$section.$innerSection.reserved", groups[1]!!.value)
+                map.putMemoryValue("$section.$innerSection.committed", groups[2]!!.value)
                 continue
             }
 
             groups = NMT_STATS_SECTION_ATTR_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
                 attr = groups[1]!!.value.slugify()
-                memory(map, "$section.$innerSection.$attr", groups[2]!!.value)
+                map.putMemoryValue("$section.$innerSection.$attr", groups[2]!!.value)
                 continue
             }
 
             groups = NMT_STATS_SECTION_ATTR_PERCENTAGE_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
                 attr = groups[1]!!.value.slugify()
-                memory(map, "$section.$innerSection.$attr", groups[2]!!.value)
+                map.putMemoryValue("$section.$innerSection.$attr", groups[2]!!.value)
                 map["$section.$innerSection.$attr.percentage"] = groups[3]!!.value
                 continue
             }
 
             groups = NMT_ARENA_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "$section.arena.allocated", groups[1]!!.value)
+                map.putMemoryValue("$section.arena.allocated", groups[1]!!.value)
                 map["$section.arena.allocations"] = groups[2]!!.value
                 continue
             }
@@ -120,8 +120,8 @@ class JvmNativeMemoryTrackingParser {
 
             groups = NMT_STACK_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                memory(map, "$section.stack.reserved", groups[1]!!.value)
-                memory(map, "$section.stack.committed", groups[2]!!.value)
+                map.putMemoryValue("$section.stack.reserved", groups[1]!!.value)
+                map.putMemoryValue("$section.stack.committed", groups[2]!!.value)
                 continue
             }
         }
@@ -129,11 +129,11 @@ class JvmNativeMemoryTrackingParser {
         return map
     }
 
-    private fun memory(map: HashMap<String, Any>, key: String, value: String) {
+    private fun HashMap<String, Any>.putMemoryValue(key: String, value: String) {
         val valueAsInt = value.substringBeforeLast("KB").toInt()
-        map[key] = valueAsInt
-        map["$key.kb"] = valueAsInt
-        map["$key.mb"] = valueAsInt / 1024
-        map["$key.gb"] = valueAsInt / 1024 / 1024
+        this[key] = valueAsInt
+        this["$key.kb"] = valueAsInt
+        this["$key.mb"] = valueAsInt / 1024
+        this["$key.gb"] = valueAsInt / 1024 / 1024
     }
 }

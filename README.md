@@ -1,7 +1,18 @@
 # NMT Metrics Spring Boot Starter
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 The Native Memory Tracking (NMT) is a Java HotSpot VM feature that tracks internal memory usage for a HotSpot JVM. 
 You can access NMT data using `jcmd` utility.
+
+## Table of Content
+- [NMT Metrics Motivation](#1-nmt-metrics-motivation)
+- [Quick Start](#2-quick-start)
+  - [Exposing Prometheus endpoint](#21-exposing-prometheus-endpoint)
+  - [Enable NMT](#22-enable-nmt)
+- [Metrics List](#3-metrics-list)
+- [Grafana Settings Suggestions](#4-grafana-settings-suggestions)
+- [License](#5-license)
 
 ## 1. NMT Metrics Motivation
 
@@ -48,3 +59,8 @@ performance.
 ```
 
 ## 3. Metrics List
+
+## 4. Grafana Settings Suggestions
+
+## 5. License
+
