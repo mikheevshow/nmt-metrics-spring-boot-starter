@@ -6,7 +6,7 @@ plugins {
     id("org.springframework.boot") version "2.7.8"
     id("io.spring.dependency-management") version "1.1.0"
     `maven-publish`
-    signing
+//    signing
 }
 
 group = "com.github.mikheevshow"
@@ -31,6 +31,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs = jvmArgs!! + listOf(
+        "-XX:+HeapDumpOnOutOfMemoryError"
+    )
 }
 
 tasks.withType<KotlinCompile> {

@@ -14,11 +14,8 @@ class JvmNativeMemoryTrackingModeChecker(
         val commandLineResult = commandLineExecutor.getNmtSummary()
         if (commandLineResult.contains(nmtNotEnabledMessage)) {
             throw JvmNativeMemoryTrackingMetricsException(
-                """
-                    Native memory tracking (NMT) is not enabled, 
-                    please add `-XX:NativeMemoryTracking=detail` to JVM startup options or 
-                    set property `management.metrics.nmt.enabled=false`.
-                """.trimIndent()
+                "Native memory tracking (NMT) is not enabled, please add `-XX:NativeMemoryTracking=detail` to JVM " +
+                        "startup options or set property `management.metrics.nmt.enabled=false`."
             )
         }
 

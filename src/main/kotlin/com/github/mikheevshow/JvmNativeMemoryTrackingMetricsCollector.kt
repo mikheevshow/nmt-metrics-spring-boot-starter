@@ -23,7 +23,7 @@ class JvmNativeMemoryTrackingMetricsCollector(
                     try {
                         GaugeMetricFamily(
                             "${NATIVE_MEMORY_TRACKING_PREFIX}_${it.key.replace(".", "_").replace("-", "_")}",
-                            nameDescriptions.getDescription(it.key) ?: "",
+                            nameDescriptions[it.key]?.toString() ?: "",
                             it.value.toString().toDouble()
                         )
                     } catch (ex: Exception) {
@@ -34,7 +34,7 @@ class JvmNativeMemoryTrackingMetricsCollector(
                 .filterNotNull()
                 .toMutableList()
         } catch (ex: Exception) {
-            log.error("Error when collect nmt metrics", ex)
+            log.error("Error when collect NMT metrics", ex)
             return mutableListOf()
         }
     }
