@@ -19,7 +19,14 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     api("io.micrometer:micrometer-registry-prometheus:1.10.3")
+
     testImplementation(kotlin("test"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testApi("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testImplementation("io.mockk:mockk:1.13.4")
+    testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
+    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 }
 
 tasks.test {
