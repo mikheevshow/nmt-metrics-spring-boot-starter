@@ -10,3 +10,9 @@ inline fun Logger.trace(throwable: Throwable, block: () -> String) {
         trace(block.invoke(), throwable)
     }
 }
+
+inline fun Logger.info(block: () -> String) {
+    if (isInfoEnabled) {
+        info(block.invoke())
+    }
+}

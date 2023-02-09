@@ -5,8 +5,9 @@
 ## Table of Content
 - [Introduction](#introduction)
 - [Quick Start](#1-quick-start)
-  - [Exposing Prometheus endpoint](#11-exposing-prometheus-endpoint)
-  - [Enable NMT](#12-enable-nmt)
+  - [Add Dependencies](#11-add-dependencies)
+  - [Exposing Prometheus endpoint](#12-exposing-prometheus-endpoint)
+  - [Enable NMT](#13-enable-nmt)
 - [Grafana Settings Suggestions](#2-grafana-settings-suggestions)
 - [License](#3-license)
 
@@ -21,7 +22,7 @@ jcmd <pid> VM.native_memory summary
 ```
 
 Will give you a result like this
-```yaml
+```
 Total:  reserved=664192KB,  committed=253120KB
  
 -                 Java Heap (reserved=516096KB, committed=204800KB)
@@ -50,15 +51,13 @@ Total:  reserved=664192KB,  committed=253120KB
 The starter executes `jcmd` internally in application every time when `/actuator/metrics` endpoint is triggered and 
 produce NMT metrics using micrometer gauges.
 
-
-
-
 ### 1. Quick Start
 
-#### 1.1. Exposing Prometheus endpoint
+#### 1.1. Add Dependencies
 
 Make sure to include below dependencies:
 
+For Gradle:
 ```kotlin
 implementation("org.springframework.boot:spring-boot-starter-actuator")
 implementation("io.micrometer:micrometer-registry-prometheus")
@@ -68,10 +67,44 @@ implementation("org.springframework.boot:spring-boot-starter-web")
 implementation("com.github.mikheevshow:jvm-nmt-metrics-spring-boot-starter:<<current_version>>")
 ```
 
+For Apache Maven
+```xml
+
+<dependencies>
+  
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+  </dependency>
+  
+  <dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+  </dependency>
+  
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+  
+  <!--  And nmt starter dependency-->
+  <dependency>
+    <groupId>com.github.mikheevshow</groupId>
+    <artifactId>jvm-nmt-metrics-spring-boot-starter</artifactId>
+    <version>current_version</version>
+  </dependency>
+  
+</dependencies>
+```
+
+#### 1.2. Exposing Prometheus endpoint
+
 Configuration:
 ```yaml
 management:
   metrics:
+    nmt:
+      enabled: true # enable NMT metrics
     export:
       prometheus:
         enabled: true
@@ -83,7 +116,7 @@ management:
 
 Standard `/actuator/metrics` and `actuator/prometheus` endpoints will render `nmt_*` metrics
 
-#### 1.2. Enable NMT
+#### 1.3. Add JVM Option
 Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling this will cause 5-10% performance overhead.
 
 ```

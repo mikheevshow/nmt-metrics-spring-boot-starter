@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(
-    prefix = "spring.management.metrics.native-memory.enabled",
+    prefix = "management.metrics.nmt.enabled",
     havingValue = "true",
     matchIfMissing = true
 )
@@ -16,14 +16,22 @@ class JvmNativeMemoryTrackingMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    fun jvmNativeMemoryTrackingParser(): JvmNativeMemoryTrackingParser {
-        return JvmNativeMemoryTrackingParser()
+    fun commandLineExecutor(): CommandLineExecutor {
+        return DefaultCommandLineExecutor()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    fun jvmNativeMemoryTrackingProvider(): JvmNativeMemoryTrackingProvider {
-        return JvmNativeMemoryTrackingProvider()
+    fun jvmNativeMemoryTrackingModeChecker(
+        commandLineExecutor: CommandLineExecutor
+    ): JvmNativeMemoryTrackingModeChecker {
+        return JvmNativeMemoryTrackingModeChecker(commandLineExecutor)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun jvmNativeMemoryTrackingParser(): JvmNativeMemoryTrackingParser {
+        return JvmNativeMemoryTrackingParser()
     }
 
     @Bean
@@ -35,14 +43,14 @@ class JvmNativeMemoryTrackingMetricsAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     fun jvmNativeMemoryTrackingMetricsCollector(
-        jvmNativeMemoryTrackingProvider: JvmNativeMemoryTrackingProvider,
+        commandLineExecutor: CommandLineExecutor,
         jvmNativeMemoryTrackingParser: JvmNativeMemoryTrackingParser,
         jvmNativeMemoryTrackingMetricsNameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions
     ): JvmNativeMemoryTrackingMetricsCollector {
         return JvmNativeMemoryTrackingMetricsCollector(
-            nmtProvider = jvmNativeMemoryTrackingProvider,
             parser = jvmNativeMemoryTrackingParser,
-            nameDescriptions = jvmNativeMemoryTrackingMetricsNameDescriptions
+            nameDescriptions = jvmNativeMemoryTrackingMetricsNameDescriptions,
+            commandLineExecutor = commandLineExecutor
         )
     }
 

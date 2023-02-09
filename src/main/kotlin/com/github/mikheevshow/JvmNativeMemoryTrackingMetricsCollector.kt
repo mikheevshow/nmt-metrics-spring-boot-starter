@@ -4,9 +4,9 @@ import io.prometheus.client.Collector
 import io.prometheus.client.GaugeMetricFamily
 
 class JvmNativeMemoryTrackingMetricsCollector(
-    private val nmtProvider: JvmNativeMemoryTrackingProvider,
+    private val nameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions,
     private val parser: JvmNativeMemoryTrackingParser,
-    private val nameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions
+    private val commandLineExecutor: CommandLineExecutor,
 ) : Collector() {
 
     private val log = logger()
@@ -14,7 +14,7 @@ class JvmNativeMemoryTrackingMetricsCollector(
     override fun collect(): MutableList<MetricFamilySamples> {
         try {
 
-            val nmt = nmtProvider.getNmtDescription()
+            val nmt = commandLineExecutor.getNmtSummary()
             val metricsMap = parser.parse(nmt)
 
             return metricsMap
