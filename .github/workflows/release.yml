@@ -27,7 +27,7 @@ jobs:
       run: ./gradlew assembleRelease
 
     - name: Source jar
-      run: ./gradlew nmt javadocJar
+      run: ./gradlew javadocJar
 
     - name: Publish to MavenCentral
       run: ./gradlew publishReleasePublicationToSonatypeRepository --max-workers 1 closeAndReleaseSonatypeStagingRepository
