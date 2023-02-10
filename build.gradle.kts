@@ -25,6 +25,7 @@ SOFTWARE.
  */
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
     kotlin("jvm") version "1.7.10"
@@ -32,7 +33,83 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     `maven-publish`
     `java-library`
-//    signing
+    `kotlin-dsl`
+    signing
+}
+
+ext["signing.keyId"] = null
+ext["signing.password"] = null
+ext["signing.secretKeyRingFile"] = null
+ext["ossrhUsername"] = null
+ext["ossrhPassword"] = null
+
+val secretPropsFile = project.rootProject.file("signing.properties")
+if (secretPropsFile.exists()) {
+    secretPropsFile.reader().use {
+        val props = Properties()
+        props.load(it)
+        props
+    }.onEach { (name, value) ->
+        ext[name.toString()] = value
+    }
+} else {
+    ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+    ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
+    ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
+    ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
+    ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+}
+
+fun getExtraString(name: String) = ext[name]?.toString()
+
+publishing {
+    repositories {
+        maven {
+            name = "sonatype"
+            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = getExtraString("ossrhUsername")
+                password = getExtraString("ossrhPassword")
+            }
+        }
+    }
+
+    publications.withType<MavenPublication> {
+        artifact(javadocJar.get())
+
+        pom {
+            name.set("JVM Native Memory Tracking Metrics Spring Boot Starter")
+            description.set("Spring Boot Starter for NMT metrics collecting")
+            url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
+
+            licenses {
+                license {
+                    name.set("MIT")
+                    url.set("https://opensource.org/licenses/MIT")
+                }
+            }
+
+            developers {
+                developer {
+                    id.set("IlyaMikheev")
+                    name.set("Ilya Mikheev")
+                    email.set("mikheev.show@gmail.com")
+                }
+            }
+
+            scm {
+                url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications)
 }
 
 dependencyManagement {
@@ -46,6 +123,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
