@@ -118,7 +118,7 @@ dependencyManagement {
     }
 }
 
-group = "com.github.mikheevshow"
+group = "io.github.mikheevshow"
 version = "1.0-SNAPSHOT"
 
 repositories {
