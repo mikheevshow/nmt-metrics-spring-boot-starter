@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "management.metrics.nmt.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable Native Memory Tracking metrics"
+    }
+  ],
+  "hints": [
+    {
+      "name": "management.metrics.nmt.enabled",
+      "values": [
+        {
+          "value": true,
+          "description": "Enable Native Memory Tracking metrics"
+        },
+        {
+          "value": false,
+          "description": "Disable Native Memory Tracking metrics"
+        }
+      ]
+    }
+  ]
+}
