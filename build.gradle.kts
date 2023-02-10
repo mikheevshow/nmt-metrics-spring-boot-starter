@@ -25,6 +25,7 @@ SOFTWARE.
  */
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.lang.System.getenv
 import java.util.Properties
 
 plugins {
@@ -33,38 +34,25 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     `maven-publish`
     `java-library`
-    `kotlin-dsl`
     signing
 }
 
-ext["signing.keyId"] = null
-ext["signing.password"] = null
-ext["signing.secretKeyRingFile"] = null
-ext["ossrhUsername"] = null
-ext["ossrhPassword"] = null
-
-val secretPropsFile = project.rootProject.file("signing.properties")
-if (secretPropsFile.exists()) {
-    secretPropsFile.reader().use {
-        val props = Properties()
-        props.load(it)
-        props
-    }.onEach { (name, value) ->
-        ext[name.toString()] = value
-    }
-} else {
-    ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
-    ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
-    ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
-    ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-    ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
-}
+ext["signing.keyId"] = getEnv("SIGNING_KEY_ID")
+ext["signing.password"] = getEnv("SIGNING_PASSWORD")
+ext["signing.secretKeyRingFile"] = getEnv("SIGNING_SECRET_KEY_RING_FILE")
+ext["ossrhUsername"] = getEnv("OSSRH_USERNAME")
+ext["ossrhPassword"] = getEnv("OSSRH_PASSWORD")
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
-fun getExtraString(name: String) = ext[name]?.toString()
+fun getEnv(name: String) = getenv(name) ?: ""
+fun getExtraString(name: String) = try {
+    ext[name]?.toString() ?: ""
+} catch (ex: Exception) {
+    ""
+}
 
 publishing {
     repositories {
@@ -109,6 +97,11 @@ publishing {
 }
 
 signing {
+    useInMemoryPgpKeys(
+        getExtraString("signing.keyId"),
+        getExtraString("signing.key"),
+        getExtraString("signing.password"),
+    )
     sign(publishing.publications)
 }
 
@@ -119,7 +112,7 @@ dependencyManagement {
 }
 
 group = "io.github.mikheevshow"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

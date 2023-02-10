@@ -26,12 +26,5 @@ SOFTWARE.
 
 package com.mikheevshow.git
 
-import org.junit.jupiter.api.Test
-
-class StringExtensionsTest {
-
-    @Test
-    fun `Should replace spaces to default replacement`() {
-
-    }
+class ActuatorEndpointTest {
 }

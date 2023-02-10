@@ -1,5 +1,5 @@
 
-rootProject.name = "jvm-native-memory-metrics-spring-boot-starter"
+rootProject.name = "nmt-metrics-spring-boot-starter"
 
 pluginManagement {
     repositories {
