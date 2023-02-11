@@ -1,7 +1,8 @@
 # NMT Metrics Spring Boot Starter
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg)
+[![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)]()
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mikheevshow/nmt-metrics-spring-boot-starter/badge.svg?style=flat)]()
 
 ## Table of Content
 - [Introduction](#introduction)
