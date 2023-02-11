@@ -104,10 +104,6 @@ publishing {
     }
 }
 
-if (!isSnapshot) {
-    tasks.named("publish") { finalizedBy("closeRepository") }
-}
-
 signing {
     useInMemoryPgpKeys(
         getExtraString("signing.keyId"),
