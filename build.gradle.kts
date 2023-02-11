@@ -37,6 +37,9 @@ plugins {
     signing
 }
 
+group = "io.github.mikheevshow"
+version = "1.0.0"
+
 val isSnapshot by lazy { version.toString().endsWith("SNAPSHOT") }
 
 ext["signing.keyId"] = getEnv("SIGNING_KEY_ID")
@@ -130,9 +133,6 @@ dependencyManagement {
         mavenBom("org.springframework.boot:spring-boot-dependencies:2.7.8")
     }
 }
-
-group = "io.github.mikheevshow"
-version = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
