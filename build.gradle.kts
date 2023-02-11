@@ -33,9 +33,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10"
     id("io.spring.dependency-management") version "1.1.0"
     `maven-publish`
-    `java-library`
     signing
 }
+
+val isSnapshot by lazy { version.toString().endsWith("SNAPSHOT") }
 
 ext["signing.keyId"] = getEnv("SIGNING_KEY_ID")
 ext["signing.password"] = getEnv("SIGNING_PASSWORD")
@@ -43,7 +44,7 @@ ext["signing.secretKeyRingFile"] = getEnv("SIGNING_SECRET_KEY_RING_FILE")
 ext["ossrhUsername"] = getEnv("OSSRH_USERNAME")
 ext["ossrhPassword"] = getEnv("OSSRH_PASSWORD")
 
-val javadocJar by tasks.registering(Jar::class) {
+task<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
 }
 
@@ -58,7 +59,13 @@ publishing {
     repositories {
         maven {
             name = "sonatype"
-            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+
+            url = if (isSnapshot) {
+                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            } else {
+                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
+
             credentials {
                 username = getExtraString("ossrhUsername")
                 password = getExtraString("ossrhPassword")
@@ -67,7 +74,7 @@ publishing {
     }
 
     publications.withType<MavenPublication> {
-        artifact(javadocJar.get())
+        artifact(tasks.named("javadocJar"))
 
         pom {
             name.set("JVM Native Memory Tracking Metrics Spring Boot Starter")
@@ -78,12 +85,13 @@ publishing {
                 license {
                     name.set("MIT")
                     url.set("https://opensource.org/licenses/MIT")
+                    distribution.set("repo")
                 }
             }
 
             developers {
                 developer {
-                    id.set("IlyaMikheev")
+                    id.set("mikheevshow")
                     name.set("Ilya Mikheev")
                     email.set("mikheev.show@gmail.com")
                 }
@@ -94,6 +102,10 @@ publishing {
             }
         }
     }
+}
+
+if (!isSnapshot) {
+    tasks.named("publish") { finalizedBy("closeRepository") }
 }
 
 signing {
