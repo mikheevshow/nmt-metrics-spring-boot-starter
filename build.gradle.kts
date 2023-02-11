@@ -32,7 +32,6 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10"
     id("io.spring.dependency-management") version "1.1.0"
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
 }
@@ -57,17 +56,6 @@ fun getExtraString(name: String) = try {
     ext[name]?.toString() ?: ""
 } catch (ex: Exception) {
     ""
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {  //only for users registered in Sonatype after 24 Feb 2021
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(getExtraString("ossrhUsername"))
-            password.set(getExtraString("ossrhPassword"))
-        }
-    }
 }
 
 publishing {
