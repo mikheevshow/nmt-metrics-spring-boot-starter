@@ -1,4 +1,4 @@
-name: Kotlin build with Gradle and deploy to Maven Central
+name: Publish
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,15 +22,8 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: build
-  publish:
-    name: Publish to Maven Central
-    steps:
-      - name: Release build
-        run: ./gradlew build
-
       - name: Source jar
         run: ./gradlew javadocJar
-
       - name: Publish to MavenCentral
         run: ./gradlew publishAllPublicationsToSonatypeRepository --max-workers 1
         env:
