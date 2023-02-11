@@ -24,27 +24,21 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.github.mikheevshow
 
-import java.lang.management.ManagementFactory
-import javax.management.ObjectName
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-interface CommandLineExecutor {
-    fun execute(command: String, vararg args: String): String
-}
+inline fun <reified T : Any> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
 
-class DefaultCommandLineExecutor: CommandLineExecutor {
-
-    private val mBeanServer = ManagementFactory.getPlatformMBeanServer()
-
-    override fun execute(command: String, vararg args: String): String {
-        return mBeanServer.invoke(
-            ObjectName("com.sun.management:type=DiagnosticCommand"),
-            command,
-            arrayOf(args),
-            arrayOf("[Ljava.lang.String;")
-        ) as String
+inline fun Logger.trace(throwable: Throwable, block: () -> String) {
+    if (isTraceEnabled) {
+        trace(block.invoke(), throwable)
     }
 }
 
-fun CommandLineExecutor.getNmtSummary(): String = execute("vmNativeMemory", "summary")
+inline fun Logger.info(block: () -> String) {
+    if (isInfoEnabled) {
+        info(block.invoke())
+    }
+}

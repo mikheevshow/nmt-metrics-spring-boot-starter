@@ -24,18 +24,9 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.github.mikheevshow
 
-import io.prometheus.client.CollectorRegistry
-import javax.annotation.PostConstruct
-
-class NmtMetricsRegistrar(
-    private val jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector,
-    private val collectorRegistry: CollectorRegistry
-) {
-
-    @PostConstruct
-    fun init() {
-        collectorRegistry.register(jvmNativeMemoryTrackingMetricsCollector)
-    }
-}
+class JvmNativeMemoryTrackingMetricsException(
+    message: String,
+    cause: Throwable? = null
+): RuntimeException(message, cause)

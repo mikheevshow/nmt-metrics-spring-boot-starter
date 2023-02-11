@@ -24,12 +24,12 @@ SOFTWARE.
 
  */
 
-package com.mikheevshow.git
+package io.mikheevshow.git
 
-import com.github.mikheevshow.CommandLineExecutor
-import com.github.mikheevshow.JvmNativeMemoryTrackingMetricsException
-import com.github.mikheevshow.JvmNativeMemoryTrackingModeChecker
-import com.github.mikheevshow.getNmtSummary
+import io.github.mikheevshow.CommandLineExecutor
+import io.github.mikheevshow.JvmNativeMemoryTrackingMetricsException
+import io.github.mikheevshow.JvmNativeMemoryTrackingModeChecker
+import io.github.mikheevshow.getNmtSummary
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo

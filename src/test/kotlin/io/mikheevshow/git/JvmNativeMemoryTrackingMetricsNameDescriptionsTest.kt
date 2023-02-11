@@ -24,20 +24,33 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.mikheevshow.git
 
-import java.text.Normalizer
-import java.text.Normalizer.Form.NFD
+import io.github.mikheevshow.JvmNativeMemoryTrackingMetricsNameDescriptions
+import io.kotest.matchers.collections.shouldContainAll
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.junit5.MockKExtension
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
-private val ASCII_REGEX = "[^\\p{ASCII}]".toRegex()
-private val ALPHABETIC_NUMERIC_REGEX = "[^a-zA-Z0-9\\s]+".toRegex()
-private val SPACE_REGEX = "\\s+".toRegex()
+@ExtendWith(MockKExtension::class)
+class JvmNativeMemoryTrackingMetricsNameDescriptionsTest {
 
-fun String.slugify(replacement: String = "-"): String {
-    return Normalizer
-        .normalize(this, NFD)
-        .replace(ASCII_REGEX, "")
-        .replace(ALPHABETIC_NUMERIC_REGEX, "").trim()
-        .replace(SPACE_REGEX, replacement)
-        .lowercase()
+    @InjectMockKs
+    lateinit var jvmNativeMemoryTrackingMetricsNameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions
+
+    @Test
+    fun `Should read metrics descriptions correct`() {
+        val entries = jvmNativeMemoryTrackingMetricsNameDescriptions.keys.toSet()
+        entries shouldContainAll setOf(
+            "nmt_total_reserved",
+            "nmt_total_committed",
+            "nmt_total_reserved_kb",
+            "nmt_total_committed_kb",
+            "nmt_total_reserved_mb",
+            "nmt_total_committed_mb",
+            "nmt_total_reserved_gb",
+            "nmt_total_committed_gb"
+        )
+    }
 }

@@ -24,17 +24,27 @@ SOFTWARE.
 
  */
 
-package com.mikheevshow.git
+package io.github.mikheevshow
 
-import com.github.mikheevshow.JvmNativeMemoryTrackingParser
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.extension.ExtendWith
+import java.lang.management.ManagementFactory
+import javax.management.ObjectName
 
-@ExtendWith(MockKExtension::class)
-class JvmNativeMemoryTrackingParserTest {
-
-    @InjectMockKs
-    lateinit var jvmNativeMemoryTrackingParser: JvmNativeMemoryTrackingParser
-
+interface CommandLineExecutor {
+    fun execute(command: String, vararg args: String): String
 }
+
+class DefaultCommandLineExecutor: CommandLineExecutor {
+
+    private val mBeanServer = ManagementFactory.getPlatformMBeanServer()
+
+    override fun execute(command: String, vararg args: String): String {
+        return mBeanServer.invoke(
+            ObjectName("com.sun.management:type=DiagnosticCommand"),
+            command,
+            arrayOf(args),
+            arrayOf("[Ljava.lang.String;")
+        ) as String
+    }
+}
+
+fun CommandLineExecutor.getNmtSummary(): String = execute("vmNativeMemory", "summary")

@@ -24,14 +24,8 @@ SOFTWARE.
 
  */
 
-package com.mikheevshow.git
+package io.mikheevshow.git
 
-import org.junit.jupiter.api.Test
 
-class StringExtensionsTest {
-
-    @Test
-    fun `Should replace spaces to default replacement`() {
-
-    }
+class AutoConfigurationInitializationTest {
 }

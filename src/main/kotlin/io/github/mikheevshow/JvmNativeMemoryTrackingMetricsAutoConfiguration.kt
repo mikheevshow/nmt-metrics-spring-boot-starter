@@ -24,7 +24,7 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.github.mikheevshow
 
 import io.prometheus.client.CollectorRegistry
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean

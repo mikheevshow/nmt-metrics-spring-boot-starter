@@ -24,7 +24,7 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.github.mikheevshow
 
 import io.prometheus.client.Collector
 import io.prometheus.client.GaugeMetricFamily

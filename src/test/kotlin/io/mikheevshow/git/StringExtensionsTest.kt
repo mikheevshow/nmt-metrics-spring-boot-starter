@@ -24,21 +24,14 @@ SOFTWARE.
 
  */
 
-package com.github.mikheevshow
+package io.mikheevshow.git
 
-import java.util.*
+import org.junit.jupiter.api.Test
 
-/**
- * Loads and provides Native Memory Tracking metrics description
- */
-class JvmNativeMemoryTrackingMetricsNameDescriptions: Properties() {
+class StringExtensionsTest {
 
-    init {
-        try {
-            val file = javaClass.getResourceAsStream("/metrics.properties")
-            load(file)
-        } catch (ex: Exception) {
-            throw JvmNativeMemoryTrackingMetricsException("Error when read metrics descriptions", ex)
-        }
+    @Test
+    fun `Should replace spaces to default replacement`() {
+
     }
 }

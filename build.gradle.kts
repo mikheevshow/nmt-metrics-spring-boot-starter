@@ -140,6 +140,9 @@ tasks.test {
     jvmArgs = jvmArgs!! + listOf(
         "-XX:+HeapDumpOnOutOfMemoryError"
     )
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+    }
 }
 
 tasks.withType<KotlinCompile> {
