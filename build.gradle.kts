@@ -77,6 +77,8 @@ publishing {
     }
 
     publications.withType<MavenPublication> {
+        from(components["java"])
+
         artifact(tasks.named("javadocJar"))
 
         pom {
