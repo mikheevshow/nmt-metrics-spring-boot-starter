@@ -24,13 +24,13 @@ jobs:
           arguments: build
   publish:
     - name: Release build
-      run: ./gradlew assembleRelease
+      run: ./gradlew build
 
     - name: Source jar
       run: ./gradlew javadocJar
 
     - name: Publish to MavenCentral
-      run: ./gradlew publishReleasePublicationToSonatypeRepository --max-workers 1 closeAndReleaseSonatypeStagingRepository
+      run: ./gradlew publishAllPublicationsToSonatypeRepository --max-workers 1
       env:
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
