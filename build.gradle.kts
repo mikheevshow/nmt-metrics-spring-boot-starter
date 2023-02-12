@@ -51,7 +51,7 @@ task<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
 }
 
-fun getEnv(name: String) = getenv(name) ?: ""
+fun getEnv(name: String) = getenv(name)
 fun getExtraString(name: String) = try {
     ext[name]?.toString() ?: ""
 } catch (ex: Exception) {
