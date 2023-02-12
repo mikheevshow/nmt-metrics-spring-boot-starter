@@ -32,8 +32,22 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10"
     id("io.spring.dependency-management") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
+}
+
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId.set(getExtraString("stagingProfileId"))
+            username.set(getExtraString("ossrhUsername"))
+            password.set(getExtraString("ossrhPassword"))
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
 }
 
 group = "io.github.mikheevshow"
@@ -43,7 +57,8 @@ val isSnapshot by lazy { version.toString().endsWith("SNAPSHOT") }
 
 ext["signing.keyId"] = getEnv("SIGNING_KEY_ID")
 ext["signing.password"] = getEnv("SIGNING_PASSWORD")
-ext["signing.secretKeyRingFile"] = getEnv("SIGNING_SECRET_KEY_RING_FILE")
+ext["signing.key"] = getEnv("SIGNING_SECRET_KEY_RING_FILE")
+ext["stagingProfileId"] = getEnv("SONATYPE_STAGING_PROFILE_ID")
 ext["ossrhUsername"] = getEnv("OSSRH_USERNAME")
 ext["ossrhPassword"] = getEnv("OSSRH_PASSWORD")
 
