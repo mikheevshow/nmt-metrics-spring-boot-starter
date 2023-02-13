@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)]()
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.mikheevshow/nmt-metrics-spring-boot-starter/badge.svg?style=flat)]()
+[![Sonatype Central](https://img.shields.io/nexus/r/io.github.mikheevshow/nmt-metrics-spring-boot-starter?color=light%20green&label=Maven%20Central&server=https%3A%2F%2Fs01.oss.sonatype.org)](https://central.sonatype.com/namespace/io.github.mikheevshow)
 
 ## Table of Content
 - [Introduction](#introduction)
