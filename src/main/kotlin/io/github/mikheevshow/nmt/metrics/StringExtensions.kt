@@ -24,18 +24,20 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
-import io.prometheus.client.CollectorRegistry
-import javax.annotation.PostConstruct
+import java.text.Normalizer
+import java.text.Normalizer.Form.NFD
 
-class NmtMetricsRegistrar(
-    private val jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector,
-    private val collectorRegistry: CollectorRegistry
-) {
+private val ASCII_REGEX = "[^\\p{ASCII}]".toRegex()
+private val ALPHABETIC_NUMERIC_REGEX = "[^a-zA-Z0-9\\s]+".toRegex()
+private val SPACE_REGEX = "\\s+".toRegex()
 
-    @PostConstruct
-    fun init() {
-        collectorRegistry.register(jvmNativeMemoryTrackingMetricsCollector)
-    }
+fun String.slugify(replacement: String = "-"): String {
+    return Normalizer
+        .normalize(this, NFD)
+        .replace(ASCII_REGEX, "")
+        .replace(ALPHABETIC_NUMERIC_REGEX, "").trim()
+        .replace(SPACE_REGEX, replacement)
+        .lowercase()
 }

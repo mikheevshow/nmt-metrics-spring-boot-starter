@@ -24,27 +24,21 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
-import javax.annotation.PostConstruct
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-class JvmNativeMemoryTrackingModeChecker(
-    private val commandLineExecutor: CommandLineExecutor
-) {
+inline fun <reified T : Any> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
 
-    private val logger = logger()
-    private val nmtNotEnabledMessage = "Native memory tracking is not enabled"
+inline fun Logger.trace(throwable: Throwable, block: () -> String) {
+    if (isTraceEnabled) {
+        trace(block.invoke(), throwable)
+    }
+}
 
-    @PostConstruct
-    fun checkNmtEnabled() {
-        val commandLineResult = commandLineExecutor.getNmtSummary()
-        if (commandLineResult.contains(nmtNotEnabledMessage)) {
-            throw JvmNativeMemoryTrackingMetricsException(
-                "Native memory tracking (NMT) is not enabled, please add `-XX:NativeMemoryTracking=detail` to JVM " +
-                        "startup options or set property `management.metrics.nmt.enabled=false`."
-            )
-        }
-
-        logger.info { "Native memory tracking metrics are enabled" }
+inline fun Logger.info(block: () -> String) {
+    if (isInfoEnabled) {
+        info(block.invoke())
     }
 }

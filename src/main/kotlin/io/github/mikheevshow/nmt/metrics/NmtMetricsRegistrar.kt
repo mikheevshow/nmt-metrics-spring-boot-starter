@@ -24,8 +24,18 @@ SOFTWARE.
 
  */
 
-package io.mikheevshow.git
+package io.github.mikheevshow.nmt.metrics
 
+import io.prometheus.client.CollectorRegistry
+import javax.annotation.PostConstruct
 
-class AutoConfigurationInitializationTest {
+open class NmtMetricsRegistrar(
+    private val jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector,
+    private val collectorRegistry: CollectorRegistry
+) {
+
+    @PostConstruct
+    fun init() {
+        collectorRegistry.register(jvmNativeMemoryTrackingMetricsCollector)
+    }
 }

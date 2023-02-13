@@ -24,12 +24,12 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
 import io.prometheus.client.Collector
 import io.prometheus.client.GaugeMetricFamily
 
-class JvmNativeMemoryTrackingMetricsCollector(
+open class JvmNativeMemoryTrackingMetricsCollector(
     private val nameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions,
     private val parser: JvmNativeMemoryTrackingParser,
     private val commandLineExecutor: CommandLineExecutor,

@@ -32,106 +32,12 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.7.10"
     id("io.spring.dependency-management") version "1.1.0"
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
 }
 
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            stagingProfileId.set(getExtraString("stagingProfileId"))
-            username.set(getExtraString("ossrhUsername"))
-            password.set(getExtraString("ossrhPassword"))
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-}
-
 group = "io.github.mikheevshow"
-version = "1.0.0"
-
-val isSnapshot by lazy { version.toString().endsWith("SNAPSHOT") }
-
-ext["signing.keyId"] = getEnv("SIGNING_KEY_ID")
-ext["signing.password"] = getEnv("SIGNING_PASSWORD")
-ext["signing.key"] = getEnv("SIGNING_SECRET_KEY_RING_FILE")
-ext["stagingProfileId"] = getEnv("SONATYPE_STAGING_PROFILE_ID")
-ext["ossrhUsername"] = getEnv("OSSRH_USERNAME")
-ext["ossrhPassword"] = getEnv("OSSRH_PASSWORD")
-
-task<Jar>("javadocJar") {
-    archiveClassifier.set("javadoc")
-}
-
-fun getEnv(name: String) = getenv(name)
-fun getExtraString(name: String) = try {
-    ext[name]?.toString() ?: ""
-} catch (ex: Exception) {
-    ""
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "sonatype"
-
-            url = if (isSnapshot) {
-                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            } else {
-                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            }
-
-            credentials {
-                username = getExtraString("ossrhUsername")
-                password = getExtraString("ossrhPassword")
-            }
-        }
-    }
-
-    publications.withType<MavenPublication> {
-        from(components["java"])
-
-        artifact(tasks.named("javadocJar"))
-
-        pom {
-            name.set("JVM Native Memory Tracking Metrics Spring Boot Starter")
-            description.set("Spring Boot Starter for NMT metrics collecting")
-            url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
-
-            licenses {
-                license {
-                    name.set("MIT")
-                    url.set("https://opensource.org/licenses/MIT")
-                    distribution.set("repo")
-                }
-            }
-
-            developers {
-                developer {
-                    id.set("mikheevshow")
-                    name.set("Ilya Mikheev")
-                    email.set("mikheev.show@gmail.com")
-                }
-            }
-
-            scm {
-                url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
-            }
-        }
-    }
-}
-
-signing {
-    useInMemoryPgpKeys(
-        getExtraString("signing.keyId"),
-        getExtraString("signing.key"),
-        getExtraString("signing.password"),
-    )
-    sign(publishing.publications)
-}
+version = "1.0.0-v2-SNAPSHOT"
 
 dependencyManagement {
     imports {
@@ -182,4 +88,95 @@ tasks.withType<JavaCompile> {
 java {
     withJavadocJar()
     withSourcesJar()
+}
+
+ext["ossrhUsername"] = null
+ext["ossrhPassword"] = null
+ext["sonatypeStagingProfileId"] = null
+ext["signing.keyId"] = null
+ext["signing.password"] = null
+ext["signing.key"] = null
+
+val secretPropsFile = project.file("local.properties")
+if (secretPropsFile.exists()) {
+    secretPropsFile.reader().use {
+        val props = Properties()
+        props.load(it)
+        props
+    }.onEach { (name, value) ->
+        ext[name.toString()] = value
+    }
+} else {
+    ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
+    ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+    ext["sonatypeStagingProfileId"] = System.getenv("SONATYPE_STAGING_PROFILE_ID")
+    ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+    ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
+    ext["signing.key"] = System.getenv("SIGNING_KEY")
+}
+
+fun getExtraString(name: String) = ext[name]?.toString()
+
+publishing {
+    repositories {
+        maven {
+            name = "sonatype"
+            url = if (version.toString().endsWith("SNAPSHOT")) {
+                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            } else {
+                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
+            credentials {
+                username = getExtraString("ossrhUsername")
+                password = getExtraString("ossrhPassword")
+            }
+        }
+    }
+
+    publications {
+        register("mavenJava", MavenPublication::class) {
+            from(components["java"])
+
+            groupId = project.group.toString()
+            artifactId = "nmt-metrics-spring-boot-starter"
+            version = project.version.toString()
+
+            pom {
+
+                name.set("JVM Native Memory Tracking Metrics Spring Boot Starter")
+                description.set("Spring Boot Starter for NMT metrics collecting")
+                url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
+
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                        distribution.set("repo")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("mikheevshow")
+                        name.set("Ilya Mikheev")
+                        email.set("mikheev.show@gmail.com")
+                    }
+                }
+
+                scm {
+                    url.set("https://github.com/mikheevshow/nmt-metrics-spring-boot-starter")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        getExtraString("signing.keyId"),
+        getExtraString("signing.key"),
+        getExtraString("signing.password")
+
+    )
+    sign(publishing.publications)
 }

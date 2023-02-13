@@ -24,9 +24,9 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
-class JvmNativeMemoryTrackingParser {
+open class JvmNativeMemoryTrackingParser {
 
     private val NMT_START_RE = "^[0-9]+\\:".toRegex()
     private val NMT_TOTAL_RE = "^Total: reserved=(.*), committed=(.*)".toRegex()

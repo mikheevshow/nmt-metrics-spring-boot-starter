@@ -24,20 +24,21 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
-import java.text.Normalizer
-import java.text.Normalizer.Form.NFD
+import java.util.*
 
-private val ASCII_REGEX = "[^\\p{ASCII}]".toRegex()
-private val ALPHABETIC_NUMERIC_REGEX = "[^a-zA-Z0-9\\s]+".toRegex()
-private val SPACE_REGEX = "\\s+".toRegex()
+/**
+ * Loads and provides Native Memory Tracking metrics description
+ */
+open class JvmNativeMemoryTrackingMetricsNameDescriptions: Properties() {
 
-fun String.slugify(replacement: String = "-"): String {
-    return Normalizer
-        .normalize(this, NFD)
-        .replace(ASCII_REGEX, "")
-        .replace(ALPHABETIC_NUMERIC_REGEX, "").trim()
-        .replace(SPACE_REGEX, replacement)
-        .lowercase()
+    init {
+        try {
+            val file = javaClass.getResourceAsStream("/metrics.properties")
+            load(file)
+        } catch (ex: Exception) {
+            throw JvmNativeMemoryTrackingMetricsException("Error when read metrics descriptions", ex)
+        }
+    }
 }

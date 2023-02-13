@@ -24,21 +24,25 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
-import java.util.*
+import io.github.mikheevshow.nmt.metrics.DefaultCommandLineExecutor
+import io.github.mikheevshow.nmt.metrics.getNmtSummary
+import io.kotest.matchers.shouldBe
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.junit5.MockKExtension
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
-/**
- * Loads and provides Native Memory Tracking metrics description
- */
-class JvmNativeMemoryTrackingMetricsNameDescriptions: Properties() {
+@ExtendWith(MockKExtension::class)
+class CommandLineExecutorTest {
 
-    init {
-        try {
-            val file = javaClass.getResourceAsStream("/metrics.properties")
-            load(file)
-        } catch (ex: Exception) {
-            throw JvmNativeMemoryTrackingMetricsException("Error when read metrics descriptions", ex)
-        }
+    @InjectMockKs
+    lateinit var defaultCommandLineExecutor: DefaultCommandLineExecutor
+
+    @Test
+    fun `Should return nmt is not enabled from console`() {
+        val commandLineResult = defaultCommandLineExecutor.getNmtSummary()
+        commandLineResult shouldBe "Native memory tracking is not enabled\n"
     }
 }

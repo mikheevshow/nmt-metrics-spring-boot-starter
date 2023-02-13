@@ -24,7 +24,7 @@ SOFTWARE.
 
  */
 
-package io.github.mikheevshow
+package io.github.mikheevshow.nmt.metrics
 
 import io.prometheus.client.CollectorRegistry
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -34,11 +34,12 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnProperty(
-    prefix = "management.metrics.nmt.enabled",
+    prefix = "management.metrics",
+    name = ["nmt.enabled"],
     havingValue = "true",
     matchIfMissing = true
 )
-class JvmNativeMemoryTrackingMetricsAutoConfiguration {
+open class JvmNativeMemoryTrackingMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

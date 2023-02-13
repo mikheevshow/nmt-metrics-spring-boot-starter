@@ -24,14 +24,9 @@ SOFTWARE.
 
  */
 
-package io.mikheevshow.git
+package io.github.mikheevshow.nmt.metrics
 
-import org.junit.jupiter.api.Test
-
-class StringExtensionsTest {
-
-    @Test
-    fun `Should replace spaces to default replacement`() {
-
-    }
-}
+open class JvmNativeMemoryTrackingMetricsException(
+    message: String,
+    cause: Throwable? = null
+): RuntimeException(message, cause)

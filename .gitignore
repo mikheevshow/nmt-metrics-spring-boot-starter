@@ -91,3 +91,5 @@ gradle-app.setting
 .classpath
 
 *.hprof
+
+local.properties
