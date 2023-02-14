@@ -46,14 +46,15 @@ open class JvmNativeMemoryTrackingMetricsCollector(
             return metricsMap
                 .asSequence()
                 .map {
+                    val metricName = "${NATIVE_MEMORY_TRACKING_PREFIX}_${it.key.replace(".", "_").replace("-", "_")}"
                     try {
                         GaugeMetricFamily(
-                            "${NATIVE_MEMORY_TRACKING_PREFIX}_${it.key.replace(".", "_").replace("-", "_")}",
-                            nameDescriptions[it.key]?.toString() ?: "",
+                            metricName,
+                            nameDescriptions.getOrEmpty(metricName),
                             it.value.toString().toDouble()
                         )
                     } catch (ex: Exception) {
-                        log.trace(ex) { "Can't convert the metric with key ${it.key} to double, because value is ${it.value}" }
+                        log.trace(ex) { "Can't convert the metric with key $metricName to double, because value is ${it.value}" }
                         null
                     }
                 }
