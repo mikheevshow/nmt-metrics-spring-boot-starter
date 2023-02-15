@@ -50,7 +50,7 @@ Total:  reserved=664192KB,  committed=253120KB
                             (mmap: reserved=25668KB, committed=24452KB)
 ...
 ```
-The starter executes `jcmd` internally in application every time when `/actuator/metrics` endpoint is triggered and 
+The starter executes `jcmd` internally in application every time when `actuator/prometheus` endpoint is triggered and 
 produce NMT metrics using micrometer gauges.
 
 ### 1. Quick Start
@@ -116,7 +116,7 @@ management:
         include: "*"
 ```
 
-Standard `/actuator/metrics` and `actuator/prometheus` endpoints will render `nmt_*` metrics
+Standard `actuator/prometheus` endpoints will render `nmt_*` metrics
 
 #### 1.3. Add JVM Option
 Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling this will cause 5-10% performance overhead.
