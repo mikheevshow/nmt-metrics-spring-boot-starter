@@ -122,7 +122,7 @@ Standard `/actuator/metrics` and `actuator/prometheus` endpoints will render `nm
 Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling this will cause 5-10% performance overhead.
 
 ```
--XX:NativeMemoryTracking=summary
+-XX:NativeMemoryTracking=detail
 ```
 
 ### 2. Grafana Settings Suggestions
