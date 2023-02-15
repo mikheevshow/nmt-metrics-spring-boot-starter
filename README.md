@@ -51,7 +51,7 @@ Total:  reserved=664192KB,  committed=253120KB
 ...
 ```
 The starter executes `jcmd` internally in application every time when `actuator/prometheus` endpoint is triggered and 
-produce NMT metrics using micrometer gauges.
+produces NMT metrics using micrometer gauges.
 
 ### 1. Quick Start
 
@@ -66,7 +66,7 @@ implementation("io.micrometer:micrometer-registry-prometheus")
 implementation("org.springframework.boot:spring-boot-starter-web")
 
 // And nmt starter dependency
-implementation("com.github.mikheevshow:jvm-nmt-metrics-spring-boot-starter:<<current_version>>")
+implementation("com.github.mikheevshow:nmt-metrics-spring-boot-starter:<<current_version>>")
 ```
 
 For Apache Maven
