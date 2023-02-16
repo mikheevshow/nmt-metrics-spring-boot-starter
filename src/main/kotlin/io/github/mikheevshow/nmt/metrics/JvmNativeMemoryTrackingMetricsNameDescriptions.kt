@@ -41,4 +41,6 @@ open class JvmNativeMemoryTrackingMetricsNameDescriptions: Properties() {
             throw JvmNativeMemoryTrackingMetricsException("Error when read metrics descriptions", ex)
         }
     }
+
+    fun getOrEmpty(metricName: String): String = this[metricName]?.toString() ?: ""
 }
