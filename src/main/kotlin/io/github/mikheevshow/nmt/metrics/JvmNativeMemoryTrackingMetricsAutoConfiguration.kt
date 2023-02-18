@@ -36,8 +36,7 @@ import org.springframework.context.annotation.Configuration
 @ConditionalOnProperty(
     prefix = "management.metrics",
     name = ["nmt.enabled"],
-    havingValue = "true",
-    matchIfMissing = true
+    havingValue = "true"
 )
 open class JvmNativeMemoryTrackingMetricsAutoConfiguration {
 
