@@ -92,7 +92,7 @@ For Apache Maven
   <!--  And nmt starter dependency-->
   <dependency>
     <groupId>com.github.mikheevshow</groupId>
-    <artifactId>jvm-nmt-metrics-spring-boot-starter</artifactId>
+    <artifactId>nmt-metrics-spring-boot-starter</artifactId>
     <version>current_version</version>
   </dependency>
   
