@@ -27,16 +27,11 @@ SOFTWARE.
 package io.github.mikheevshow.nmt.metrics
 
 import io.kotest.matchers.collections.shouldContainAll
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(MockKExtension::class)
 class JvmNativeMemoryTrackingMetricsNameDescriptionsTest {
 
-    @InjectMockKs
-    lateinit var jvmNativeMemoryTrackingMetricsNameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions
+    private val jvmNativeMemoryTrackingMetricsNameDescriptions = JvmNativeMemoryTrackingMetricsNameDescriptions()
 
     @Test
     fun `Should read metrics descriptions correct`() {

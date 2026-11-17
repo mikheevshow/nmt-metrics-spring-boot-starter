@@ -57,12 +57,13 @@ produces NMT metrics using micrometer gauges.
 
 #### 1.1. Add Dependencies
 
-This version targets Spring Boot 2.7 and the Prometheus simpleclient registry. Spring Boot 3 and later are not supported.
+The 2.x line requires Java 17 or later and uses the Prometheus Java client 1.x. It targets Spring Boot 4.0 and 4.1. The 1.x line targets Spring Boot 2.7 and the legacy Prometheus simpleclient.
+
 The starter includes Actuator and the Prometheus registry. Add a web starter if you want to expose an HTTP endpoint:
 
 For Gradle:
 ```kotlin
-implementation("org.springframework.boot:spring-boot-starter-web")
+implementation("org.springframework.boot:spring-boot-starter-webmvc")
 
 // And nmt starter dependency
 implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:<<current_version>>")
@@ -75,7 +76,7 @@ For Apache Maven
   
   <dependency>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
+    <artifactId>spring-boot-starter-webmvc</artifactId>
   </dependency>
   
   <!--  And nmt starter dependency-->
@@ -96,8 +97,9 @@ management:
   metrics:
     nmt:
       enabled: true # enable NMT metrics
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
   endpoints:
     web:

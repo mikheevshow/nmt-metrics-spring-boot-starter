@@ -1,7 +1,7 @@
 package io.github.mikheevshow.nmt.metrics
 
-import io.prometheus.client.CollectorRegistry
-import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.prometheus.metrics.model.registry.PrometheusRegistry
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -15,16 +15,15 @@ class AutoConfigurationIntegrationTest {
 
     @Test
     fun `loads automatically and publishes metrics to the actuator registry`() {
-        var registry: CollectorRegistry? = null
+        var registry: PrometheusRegistry? = null
         contextRunner.withPropertyValues("management.metrics.nmt.enabled=true").run { context ->
             assertThat(context).hasNotFailed()
             assertThat(context).hasSingleBean(JvmNativeMemoryTrackingMetricsCollector::class.java)
-            registry = context.getBean(CollectorRegistry::class.java)
-            assertThat(registry!!.getSampleValue("nmt_total_reserved_kb")).isEqualTo(2048.0)
+            registry = context.getBean(PrometheusMeterRegistry::class.java).prometheusRegistry
             assertThat(context.getBean(PrometheusMeterRegistry::class.java).scrape())
                 .contains("nmt_total_reserved_kb 2048.0")
         }
-        assertThat(registry!!.getSampleValue("nmt_total_reserved_kb") as Double?).isNull()
+        assertThat(registry!!.scrape().any { it.metadata.name == "nmt_total_reserved_kb" }).isFalse()
     }
 
     @Test
@@ -39,7 +38,7 @@ class AutoConfigurationIntegrationTest {
     fun `does not configure collector when prometheus export is disabled`() {
         contextRunner.withPropertyValues(
             "management.metrics.nmt.enabled=true",
-            "management.metrics.export.prometheus.enabled=false"
+            "management.prometheus.metrics.export.enabled=false"
         ).run { context ->
             assertThat(context).hasNotFailed()
             assertThat(context).doesNotHaveBean(JvmNativeMemoryTrackingMetricsCollector::class.java)

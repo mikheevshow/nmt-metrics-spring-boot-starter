@@ -28,6 +28,10 @@ package io.github.mikheevshow.nmt.metrics
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 
 class JvmNativeMemoryTrackingParserTest {
     private val parser = JvmNativeMemoryTrackingParser()
@@ -39,7 +43,7 @@ class JvmNativeMemoryTrackingParserTest {
             "Total: reserved=3221225472KB, committed=1536KB",
             "-                     Class (reserved=6568KB, committed=4140KB)",
             "                            (classes #665)",
-            "                            (malloc=424KB, #1000)",
+            "                            (malloc=424KB, #1000) (peak=500KB #1200)",
             "                            (mmap: reserved=6144KB, committed=3716KB)",
             "-                    Thread (reserved=6868KB, committed=6868KB)",
             "                            (thread #15)",
@@ -55,4 +59,40 @@ class JvmNativeMemoryTrackingParserTest {
         assertEquals(61L, metrics["thread.arena.allocated.kb"])
         assertEquals("15", metrics["thread.threads.total"])
     }
+    @Test
+    fun `parses a real HotSpot NMT summary`(@TempDir tempDir: Path) {
+        val source = tempDir.resolve("NmtProbe.java")
+        Files.writeString(source, """
+            import java.lang.management.ManagementFactory;
+            import javax.management.ObjectName;
+            public class NmtProbe {
+                public static void main(String[] args) throws Exception {
+                    Object result = ManagementFactory.getPlatformMBeanServer().invoke(
+                        new ObjectName("com.sun.management:type=DiagnosticCommand"), "vmNativeMemory",
+                        new Object[]{new String[]{"summary"}}, new String[]{"[Ljava.lang.String;"});
+                    System.out.print(result);
+                }
+            }
+        """.trimIndent())
+        val java = Path.of(System.getProperty("java.home"), "bin", "java").toString()
+        val process = ProcessBuilder(java, "-XX:NativeMemoryTracking=summary", source.toString())
+            .redirectErrorStream(true).start()
+        if (!process.waitFor(30, TimeUnit.SECONDS)) {
+            process.destroyForcibly()
+            error("NMT probe timed out")
+        }
+        val output = process.inputStream.bufferedReader().readText()
+        assertEquals(0, process.exitValue(), output)
+        val metrics = parser.parse(output)
+        check((metrics["total.reserved.kb"] as Long) > 0)
+        check((metrics["total.committed.kb"] as Long) > 0)
+        val collector = JvmNativeMemoryTrackingMetricsCollector(
+            JvmNativeMemoryTrackingMetricsNameDescriptions(), parser,
+            object : CommandLineExecutor {
+                override fun execute(command: String, vararg args: String) = output
+            }
+        )
+        assertEquals(metrics.size, collector.collect().size())
+    }
+
 }
