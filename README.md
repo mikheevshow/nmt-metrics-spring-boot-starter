@@ -1,5 +1,7 @@
 # NMT Metrics Spring Boot Starter
 
+![Robot diagnosing JVM memory with a cup of Java coffee](docs/images/nmt-readme-banner.png)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.mikheevshow/nmt-metrics-spring-boot-starter)](https://central.sonatype.com/artifact/io.github.mikheevshow/nmt-metrics-spring-boot-starter)
