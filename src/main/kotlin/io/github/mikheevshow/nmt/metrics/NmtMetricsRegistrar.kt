@@ -28,11 +28,17 @@ package io.github.mikheevshow.nmt.metrics
 
 import io.prometheus.client.CollectorRegistry
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 open class NmtMetricsRegistrar(
     private val jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector,
     private val collectorRegistry: CollectorRegistry
 ) {
+
+    @PreDestroy
+    fun destroy() {
+        collectorRegistry.unregister(jvmNativeMemoryTrackingMetricsCollector)
+    }
 
     @PostConstruct
     fun init() {

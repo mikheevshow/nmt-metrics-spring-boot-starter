@@ -26,15 +26,33 @@ SOFTWARE.
 
 package io.github.mikheevshow.nmt.metrics
 
-import io.github.mikheevshow.nmt.metrics.JvmNativeMemoryTrackingParser
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-@ExtendWith(MockKExtension::class)
 class JvmNativeMemoryTrackingParserTest {
+    private val parser = JvmNativeMemoryTrackingParser()
 
-    @InjectMockKs
-    lateinit var jvmNativeMemoryTrackingParser: JvmNativeMemoryTrackingParser
+    @Test
+    fun `parses realistic output with large values and CRLF line endings`() {
+        val output = listOf(
+            "Native Memory Tracking:",
+            "Total: reserved=3221225472KB, committed=1536KB",
+            "-                     Class (reserved=6568KB, committed=4140KB)",
+            "                            (classes #665)",
+            "                            (malloc=424KB, #1000)",
+            "                            (mmap: reserved=6144KB, committed=3716KB)",
+            "-                    Thread (reserved=6868KB, committed=6868KB)",
+            "                            (thread #15)",
+            "                            (arena=61KB, #30)"
+        ).joinToString("\r\n")
 
+        val metrics = parser.parse(output)
+        assertEquals(3221225472L, metrics["total.reserved.kb"])
+        assertEquals(1.5, metrics["total.committed.mb"])
+        assertEquals("665", metrics["class.classes.total"])
+        assertEquals(424L, metrics["class.malloc.allocated.kb"])
+        assertEquals("1000", metrics["class.malloc.allocations"])
+        assertEquals(61L, metrics["thread.arena.allocated.kb"])
+        assertEquals("15", metrics["thread.threads.total"])
+    }
 }
