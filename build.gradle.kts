@@ -52,13 +52,12 @@ repositories {
 
 dependencies {
 
-    compileOnly("org.springframework.boot:spring-boot")
-    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    compileOnly("org.slf4j:slf4j-api:2.0.6")
-    compileOnly("io.micrometer:micrometer-registry-prometheus:1.10.3")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testApi("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("io.mockk:mockk:1.13.4")

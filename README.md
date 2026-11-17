@@ -57,12 +57,11 @@ produces NMT metrics using micrometer gauges.
 
 #### 1.1. Add Dependencies
 
-Make sure to include below dependencies:
+This version targets Spring Boot 2.7 and the Prometheus simpleclient registry. Spring Boot 3 and later are not supported.
+The starter includes Actuator and the Prometheus registry. Add a web starter if you want to expose an HTTP endpoint:
 
 For Gradle:
 ```kotlin
-implementation("org.springframework.boot:spring-boot-starter-actuator")
-implementation("io.micrometer:micrometer-registry-prometheus")
 implementation("org.springframework.boot:spring-boot-starter-web")
 
 // And nmt starter dependency
@@ -73,16 +72,6 @@ For Apache Maven
 ```xml
 
 <dependencies>
-  
-  <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-  </dependency>
-  
-  <dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-prometheus</artifactId>
-  </dependency>
   
   <dependency>
     <groupId>org.springframework.boot</groupId>
