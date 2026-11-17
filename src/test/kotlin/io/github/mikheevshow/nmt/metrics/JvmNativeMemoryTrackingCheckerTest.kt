@@ -54,7 +54,7 @@ class JvmNativeMemoryTrackingCheckerTest {
         every { commandLineExecutor.getNmtSummary() } returns "Native memory tracking is not enabled."
         shouldThrowExactly<JvmNativeMemoryTrackingMetricsException> {
             jvmNativeMemoryTrackingModeChecker.checkNmtEnabled()
-        }.message shouldBe "Native memory tracking (NMT) is not enabled, please add `-XX:NativeMemoryTracking=detail`" +
+        }.message shouldBe "Native memory tracking (NMT) is not enabled, please add `-XX:NativeMemoryTracking=summary`" +
                 " to JVM startup options or set property `management.metrics.nmt.enabled=false`."
     }
 

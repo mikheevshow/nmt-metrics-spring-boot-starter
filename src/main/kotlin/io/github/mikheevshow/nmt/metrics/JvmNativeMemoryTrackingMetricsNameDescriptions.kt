@@ -35,8 +35,8 @@ open class JvmNativeMemoryTrackingMetricsNameDescriptions: Properties() {
 
     init {
         try {
-            val file = javaClass.getResourceAsStream("/metrics.properties")
-            load(file)
+            val file = requireNotNull(javaClass.getResourceAsStream("/metrics.properties"))
+            file.use { load(it) }
         } catch (ex: Exception) {
             throw JvmNativeMemoryTrackingMetricsException("Error when read metrics descriptions", ex)
         }

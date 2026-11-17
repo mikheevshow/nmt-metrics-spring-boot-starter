@@ -50,7 +50,7 @@ Total:  reserved=664192KB,  committed=253120KB
                             (mmap: reserved=25668KB, committed=24452KB)
 ...
 ```
-The starter executes `jcmd` internally in application every time when `actuator/prometheus` endpoint is triggered and 
+The starter invokes the JVM diagnostic command through its platform MBean on each Prometheus scrape and
 produces NMT metrics using micrometer gauges.
 
 ### 1. Quick Start
@@ -66,7 +66,7 @@ implementation("io.micrometer:micrometer-registry-prometheus")
 implementation("org.springframework.boot:spring-boot-starter-web")
 
 // And nmt starter dependency
-implementation("com.github.mikheevshow:nmt-metrics-spring-boot-starter:<<current_version>>")
+implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:<<current_version>>")
 ```
 
 For Apache Maven
@@ -91,7 +91,7 @@ For Apache Maven
   
   <!--  And nmt starter dependency-->
   <dependency>
-    <groupId>com.github.mikheevshow</groupId>
+    <groupId>io.github.mikheevshow</groupId>
     <artifactId>nmt-metrics-spring-boot-starter</artifactId>
     <version>current_version</version>
   </dependency>
@@ -122,7 +122,7 @@ Standard `actuator/prometheus` endpoints will render `nmt_*` metrics
 Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling this will cause 5-10% performance overhead.
 
 ```
--XX:NativeMemoryTracking=detail
+-XX:NativeMemoryTracking=summary
 ```
 
 ### 2. Grafana Settings Suggestions

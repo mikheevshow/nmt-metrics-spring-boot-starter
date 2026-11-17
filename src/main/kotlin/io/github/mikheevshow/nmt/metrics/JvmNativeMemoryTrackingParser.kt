@@ -44,7 +44,7 @@ open class JvmNativeMemoryTrackingParser {
     private val NMT_STACK_RE = "\\(stack: reserved=(.*), committed=(.*)\\)".toRegex()
 
     fun parse(s: String): Map<String, Any> {
-        val lines = s.split(System.getProperty("line.separator"))
+        val lines = s.lines()
 
         val map = HashMap<String, Any>()
 
@@ -83,7 +83,7 @@ open class JvmNativeMemoryTrackingParser {
 
             groups = NMT_CLASSES_RE.find(line)?.groups
             if (groups?.isNotEmpty() == true) {
-                map["$section.classes.total"] = groups[1]!!.value
+                map["$section.classes.total"] = groups[2]!!.value
                 continue
             }
 
@@ -127,7 +127,7 @@ open class JvmNativeMemoryTrackingParser {
             if (groups?.isNotEmpty() == true) {
                 attr = groups[1]!!.value.slugify()
                 map.putMemoryValue("$section.$innerSection.$attr", groups[2]!!.value)
-                map["$section.$innerSection.$attr.percentage"] = groups[3]!!.value
+                map["$section.$innerSection.$attr.percentage"] = groups[3]!!.value.removeSuffix("%")
                 continue
             }
 
@@ -156,10 +156,10 @@ open class JvmNativeMemoryTrackingParser {
     }
 
     private fun HashMap<String, Any>.putMemoryValue(key: String, value: String) {
-        val valueAsInt = value.substringBeforeLast("KB").toInt()
-        this[key] = valueAsInt
-        this["$key.kb"] = valueAsInt
-        this["$key.mb"] = valueAsInt / 1024
-        this["$key.gb"] = valueAsInt / 1024 / 1024
+        val valueAsLong = value.trim().removeSuffix(",").removeSuffix("KB").toLong()
+        this[key] = valueAsLong
+        this["$key.kb"] = valueAsLong
+        this["$key.mb"] = valueAsLong / 1024.0
+        this["$key.gb"] = valueAsLong / 1024.0 / 1024.0
     }
 }
