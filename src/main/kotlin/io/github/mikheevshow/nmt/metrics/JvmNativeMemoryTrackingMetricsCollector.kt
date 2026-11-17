@@ -40,16 +40,23 @@ open class JvmNativeMemoryTrackingMetricsCollector(
     override fun collect(): MetricSnapshots {
         return try {
             val metrics = parser.parse(commandLineExecutor.getNmtSummary()).mapNotNull { (key, value) ->
-                val metricName = "${NATIVE_MEMORY_TRACKING_PREFIX}_${key.replace(".", "_").replace("-", "_")}"
+                val originalName = "${NATIVE_MEMORY_TRACKING_PREFIX}_${key.replace(".", "_").replace("-", "_")}"
+                // These values are gauges, and Prometheus reserves _total for counters.
+                val metricName = if (originalName.endsWith("_total")) originalName.removeSuffix("_total") + "_count" else originalName
                 val number = value.toString().toDoubleOrNull()
                 if (number == null) {
                     null
                 } else {
-                    GaugeSnapshot.builder()
-                        .name(metricName)
-                        .help(nameDescriptions.getOrEmpty(metricName))
-                        .dataPoint(GaugeSnapshot.GaugeDataPointSnapshot.builder().value(number).build())
-                        .build()
+                    try {
+                        GaugeSnapshot.builder()
+                            .name(metricName)
+                            .help(nameDescriptions.getOrEmpty(originalName))
+                            .dataPoint(GaugeSnapshot.GaugeDataPointSnapshot.builder().value(number).build())
+                            .build()
+                    } catch (ex: IllegalArgumentException) {
+                        log.warn("Cannot export NMT metric {}", metricName, ex)
+                        null
+                    }
                 }
             }
             MetricSnapshots(metrics)

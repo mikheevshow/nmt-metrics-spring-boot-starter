@@ -22,6 +22,8 @@ class AutoConfigurationIntegrationTest {
             registry = context.getBean(PrometheusMeterRegistry::class.java).prometheusRegistry
             assertThat(context.getBean(PrometheusMeterRegistry::class.java).scrape())
                 .contains("nmt_total_reserved_kb 2048.0")
+                .contains("nmt_class_classes_count 665.0")
+                .contains("nmt_thread_threads_count 15.0")
         }
         assertThat(registry!!.scrape().any { it.metadata.name == "nmt_total_reserved_kb" }).isFalse()
     }
@@ -51,7 +53,9 @@ class AutoConfigurationIntegrationTest {
         @Bean
         fun commandLineExecutor(): CommandLineExecutor = object : CommandLineExecutor {
             override fun execute(command: String, vararg args: String) =
-                "Native Memory Tracking:\nTotal: reserved=2048KB, committed=1024KB\n"
+                "Native Memory Tracking:\nTotal: reserved=2048KB, committed=1024KB\n" +
+                    "- Class (reserved=100KB, committed=50KB)\n(classes #665)\n" +
+                    "- Thread (reserved=100KB, committed=50KB)\n(thread #15)\n"
         }
     }
 }

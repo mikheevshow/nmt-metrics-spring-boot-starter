@@ -59,6 +59,8 @@ produces NMT metrics using micrometer gauges.
 
 The 2.x line requires Java 17 or later and uses the Prometheus Java client 1.x. It targets Spring Boot 4.0 and 4.1. The 1.x line targets Spring Boot 2.7 and the legacy Prometheus simpleclient.
 
+In 2.x, the class and thread gauges are named `nmt_class_classes_count` and `nmt_thread_threads_count` (previously suffixed `_total`); update dashboards and alerts when upgrading.
+
 The starter includes Actuator and the Prometheus registry. Add a web starter if you want to expose an HTTP endpoint:
 
 For Gradle:
