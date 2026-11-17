@@ -26,22 +26,20 @@ SOFTWARE.
 
 package io.github.mikheevshow.nmt.metrics
 
-import io.prometheus.client.CollectorRegistry
-import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
+import io.prometheus.metrics.model.registry.PrometheusRegistry
+import org.springframework.beans.factory.DisposableBean
+import org.springframework.beans.factory.InitializingBean
 
 open class NmtMetricsRegistrar(
     private val jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector,
-    private val collectorRegistry: CollectorRegistry
-) {
+    private val collectorRegistry: PrometheusRegistry
+) : InitializingBean, DisposableBean {
 
-    @PreDestroy
-    fun destroy() {
+    override fun destroy() {
         collectorRegistry.unregister(jvmNativeMemoryTrackingMetricsCollector)
     }
 
-    @PostConstruct
-    fun init() {
+    override fun afterPropertiesSet() {
         collectorRegistry.register(jvmNativeMemoryTrackingMetricsCollector)
     }
 }

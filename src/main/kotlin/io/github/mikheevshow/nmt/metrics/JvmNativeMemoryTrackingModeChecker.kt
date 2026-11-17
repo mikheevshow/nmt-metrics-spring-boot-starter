@@ -26,16 +26,17 @@ SOFTWARE.
 
 package io.github.mikheevshow.nmt.metrics
 
-import javax.annotation.PostConstruct
+import org.springframework.beans.factory.InitializingBean
 
 open class JvmNativeMemoryTrackingModeChecker(
     private val commandLineExecutor: CommandLineExecutor
-) {
+) : InitializingBean {
 
     private val logger = logger()
     private val nmtNotEnabledMessage = "Native memory tracking is not enabled"
 
-    @PostConstruct
+    override fun afterPropertiesSet() = checkNmtEnabled()
+
     fun checkNmtEnabled() {
         val commandLineResult = commandLineExecutor.getNmtSummary()
         if (commandLineResult.contains(nmtNotEnabledMessage)) {

@@ -29,19 +29,19 @@ package io.github.mikheevshow.nmt.metrics
 open class JvmNativeMemoryTrackingParser {
 
     private val NMT_START_RE = "^[0-9]+\\:".toRegex()
-    private val NMT_TOTAL_RE = "^Total: reserved=(.*), committed=(.*)".toRegex()
-    private val NMT_SECTION_RE = "^-\\s+([A-Za-z0-9 -]+) \\(reserved=(.*), committed=(.*)\\)".toRegex()
-    private val NMT_SECTION_MMAP_RE = "\\(mmap: reserved=(.*), committed=(.*)\\)".toRegex()
+    private val NMT_TOTAL_RE = "^Total: reserved=([0-9]+KB), committed=([0-9]+KB)".toRegex()
+    private val NMT_SECTION_RE = "^-\\s+([A-Za-z0-9 -]+) \\(reserved=([0-9]+KB), committed=([0-9]+KB)\\)".toRegex()
+    private val NMT_SECTION_MMAP_RE = "\\(mmap: reserved=([0-9]+KB), committed=([0-9]+KB)\\)".toRegex()
     private val NMT_CLASSES_RE = "(classes #([0-9]+))".toRegex()
     private val NMT_CLASS_INSTANCES_RE = "\\( *instance classes \\#([0-9]+), array classes \\#([0-9]+)\\)".toRegex()
-    private val NMT_MALLOC_RE = "\\(malloc=(.*) #([0-9]+)\\)".toRegex()
+    private val NMT_MALLOC_RE = "\\(malloc=([0-9]+KB),? #([0-9]+)\\)".toRegex()
     private val NMT_THREADS_RE = "\\(thread #([0-9]+)\\)".toRegex()
     private val NMT_STATS_SECTION_START_RE = "\\(  ([a-zA-Z ]+)\\: *\\)".toRegex()
-    private val NMT_STATS_SECTION_MEMORY_RE = "\\(    reserved=(.*), committed=(.*)\\)".toRegex()
+    private val NMT_STATS_SECTION_MEMORY_RE = "\\(    reserved=([0-9]+KB), committed=([0-9]+KB)\\)".toRegex()
     private val NMT_STATS_SECTION_ATTR_RE = "\\(    ([a-zA-Z ]+)=([0-9]+[A-Z]+)\\)".toRegex()
     private val NMT_STATS_SECTION_ATTR_PERCENTAGE_RE = "\\(    ([a-zA-Z ]+)=([0-9]+[A-Z]+) .([0-9\\.\\%]+)\\)".toRegex()
-    private val NMT_ARENA_RE = "\\(arena=(.*) \\#([0-9]+)\\)".toRegex()
-    private val NMT_STACK_RE = "\\(stack: reserved=(.*), committed=(.*)\\)".toRegex()
+    private val NMT_ARENA_RE = "\\(arena=([0-9]+KB),? \\#([0-9]+)\\)".toRegex()
+    private val NMT_STACK_RE = "\\(stack: reserved=([0-9]+KB), committed=([0-9]+KB)\\)".toRegex()
 
     fun parse(s: String): Map<String, Any> {
         val lines = s.lines()

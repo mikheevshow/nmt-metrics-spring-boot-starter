@@ -26,13 +26,22 @@ SOFTWARE.
 
 package io.github.mikheevshow.nmt.metrics
 
-import io.prometheus.client.CollectorRegistry
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import org.springframework.boot.autoconfigure.AutoConfigureAfter
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@AutoConfigureAfter(name = [
+    "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration",
+    "org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration"
+])
+@ConditionalOnClass(PrometheusMeterRegistry::class)
+@ConditionalOnBean(PrometheusMeterRegistry::class)
 @ConditionalOnProperty(
     prefix = "management.metrics",
     name = ["nmt.enabled"],
@@ -81,12 +90,13 @@ open class JvmNativeMemoryTrackingMetricsAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     fun jvmNativeMemoryCollectorRegistrar(
-        collectorRegistry: CollectorRegistry,
+        collectorRegistry: PrometheusMeterRegistry,
         jvmNativeMemoryTrackingMetricsCollector: JvmNativeMemoryTrackingMetricsCollector
     ): NmtMetricsRegistrar {
         return NmtMetricsRegistrar(
-            collectorRegistry = collectorRegistry,
+            collectorRegistry = collectorRegistry.prometheusRegistry,
             jvmNativeMemoryTrackingMetricsCollector = jvmNativeMemoryTrackingMetricsCollector
         )
     }

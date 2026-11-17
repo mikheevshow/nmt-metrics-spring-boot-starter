@@ -1,142 +1,109 @@
 # NMT Metrics Spring Boot Starter
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)]()
+[![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml)
 [![Sonatype Central](https://img.shields.io/nexus/r/io.github.mikheevshow/nmt-metrics-spring-boot-starter?color=light%20green&label=Maven%20Central&server=https%3A%2F%2Fs01.oss.sonatype.org)](https://central.sonatype.com/namespace/io.github.mikheevshow)
 
-## Table of Content
+## Table of Contents
+
 - [Introduction](#introduction)
 - [Quick Start](#1-quick-start)
-  - [Add Dependencies](#11-add-dependencies)
-  - [Exposing Prometheus endpoint](#12-exposing-prometheus-endpoint)
-  - [Enable NMT](#13-enable-nmt)
-- [Grafana Settings Suggestions](#2-grafana-settings-suggestions)
-- [License](#3-license)
+  - [Requirements and dependencies](#11-requirements-and-dependencies)
+  - [Enable NMT](#12-enable-nmt)
+  - [Expose and check the Prometheus endpoint](#13-expose-and-check-the-prometheus-endpoint)
+- [Migrating from 1.x](#2-migrating-from-1x)
+- [Grafana](#3-grafana)
+- [License](#4-license)
 
-### Introduction
+## Introduction
 
-The Native Memory Tracking (NMT) is a Java HotSpot VM feature that tracks internal memory usage for a HotSpot JVM. 
-You can access NMT data using `jcmd` utility.
+Native Memory Tracking (NMT) is a HotSpot JVM feature that tracks internal native memory usage. You can inspect a running JVM with `jcmd <pid> VM.native_memory summary`.
 
-The result of command execution in console
-```bash
-jcmd <pid> VM.native_memory summary
-```
+The starter runs the JVM diagnostic command through its platform MBean when the Prometheus registry is scraped. It registers NMT gauges directly with the Prometheus Java client used by the application's Prometheus registry.
 
-Will give you a result like this
-```
-Total:  reserved=664192KB,  committed=253120KB
- 
--                 Java Heap (reserved=516096KB, committed=204800KB)
-                            (mmap: reserved=516096KB, committed=204800KB)
- 
--                     Class (reserved=6568KB, committed=4140KB)
-                            (classes #665)
-                            (malloc=424KB, #1000)
-                            (mmap: reserved=6144KB, committed=3716KB)
- 
--                    Thread (reserved=6868KB, committed=6868KB)
-                            (thread #15)
-                            (stack: reserved=6780KB, committed=6780KB)
-                            (malloc=27KB, #66)
-                            (arena=61KB, #30)
- 
--                      Code (reserved=102414KB, committed=6314KB)
-                            (malloc=2574KB, #74316)
-                            (mmap: reserved=99840KB, committed=3740KB)
- 
--                        GC (reserved=26154KB, committed=24938KB)
-                            (malloc=486KB, #110)
-                            (mmap: reserved=25668KB, committed=24452KB)
-...
-```
-The starter invokes the JVM diagnostic command through its platform MBean on each Prometheus scrape and
-produces NMT metrics using micrometer gauges.
+## 1. Quick Start
 
-### 1. Quick Start
+### 1.1. Requirements and dependencies
 
-#### 1.1. Add Dependencies
+The 2.x line targets Spring Boot 4.0 and 4.1, Java 17 or later, and Prometheus Java client 1.x. The starter includes Actuator and the Prometheus registry. Add a web starter to expose an HTTP endpoint.
 
-Make sure to include below dependencies:
+**Release status:** This branch builds `2.0.0-SNAPSHOT`; version 2.0 has not yet been published to Maven Central. The examples below require the snapshot to be available in a repository configured for your build, or locally. Once a 2.x release is published, replace the snapshot version with that release.
 
-For Gradle:
+Gradle (Kotlin DSL):
+
 ```kotlin
-implementation("org.springframework.boot:spring-boot-starter-actuator")
-implementation("io.micrometer:micrometer-registry-prometheus")
-implementation("org.springframework.boot:spring-boot-starter-web")
-
-// And nmt starter dependency
-implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:<<current_version>>")
+// Include mavenLocal() in repositories if you installed the snapshot locally.
+implementation("org.springframework.boot:spring-boot-starter-webmvc")
+implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:2.0.0-SNAPSHOT")
 ```
 
-For Apache Maven
-```xml
+Maven:
 
+```xml
 <dependencies>
-  
   <dependency>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
+    <artifactId>spring-boot-starter-webmvc</artifactId>
   </dependency>
-  
-  <dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-prometheus</artifactId>
-  </dependency>
-  
-  <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-  </dependency>
-  
-  <!--  And nmt starter dependency-->
   <dependency>
     <groupId>io.github.mikheevshow</groupId>
     <artifactId>nmt-metrics-spring-boot-starter</artifactId>
-    <version>current_version</version>
+    <version>2.0.0-SNAPSHOT</version>
   </dependency>
-  
 </dependencies>
 ```
 
-#### 1.2. Exposing Prometheus endpoint
+These examples assume the application manages Spring Boot dependency versions, for example with the Spring Boot Gradle plugin or Maven parent.
 
-Configuration:
+### 1.2. Enable NMT
+
+Start the JVM with NMT enabled. The `summary` mode is sufficient:
+
+```text
+-XX:NativeMemoryTracking=summary
+```
+
+NMT has a runtime cost that depends on the application and JVM. Measure it in your environment. When NMT metrics are enabled but JVM NMT is disabled, the starter fails application startup with an explanatory error.
+
+### 1.3. Expose and check the Prometheus endpoint
+
+Add the following to `application.yml`:
+
 ```yaml
 management:
   metrics:
     nmt:
-      enabled: true # enable NMT metrics
-    export:
-      prometheus:
-        enabled: true
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,prometheus"
 ```
 
-Standard `actuator/prometheus` endpoints will render `nmt_*` metrics
+Prometheus export must be enabled and its registry available; if the registry is unavailable or export is disabled, the NMT collector is not configured. With the application running on port 8080, check the output:
 
-#### 1.3. Add JVM Option
-Enable NMT by adding flag in the list of JVM options. Keep in mind that enabling this will cause 5-10% performance overhead.
-
-```
--XX:NativeMemoryTracking=summary
+```bash
+curl -fsS http://localhost:8080/actuator/prometheus | grep '^nmt_'
 ```
 
-### 2. Grafana Settings Suggestions
+For example, the output can include `nmt_total_reserved_kb`, `nmt_total_committed_kb`, `nmt_class_classes_count`, and `nmt_thread_threads_count`. Values depend on the JVM and its NMT output. NMT is collected at scrape time, so a scrape invokes a JVM diagnostic command.
 
-To investigate memory leaks it's useful to work with `*_kb` metrics. This metrics are exporting from NMT in 
-kilobytes. Use the same unit when create Grafana Dashboard.
+## 2. Migrating from 1.x
+
+- Upgrade the application to Java 17 or later and Spring Boot 4.0 or 4.1. The 1.x line targets Spring Boot 2.7 and the legacy Prometheus simpleclient.
+- Use the 2.x starter and the Prometheus Java client 1.x registry supplied by its dependencies.
+- Update dashboards and alerts: `nmt_class_classes_total` is now `nmt_class_classes_count`, and `nmt_thread_threads_total` is now `nmt_thread_threads_count`. These values are gauges.
+- Memory values in `_mb` and `_gb` metrics can now contain fractions rather than being truncated to whole numbers.
+
+## 3. Grafana
+
+Use the `*_kb` metrics to inspect NMT memory usage in kilobytes. Time series visualizations can help reveal changes over time.
 
 <img width="519" alt="grafana-units" src="https://user-images.githubusercontent.com/10999015/214489872-3d3e88d8-2fda-4786-8d6f-fd036a5bdcb2.png">
 
-Using `Time Series` plots with starter's gauges will make diagnostic more visual
-
 <img width="1141" alt="time-series-plot" src="https://user-images.githubusercontent.com/10999015/214489960-f8e62c96-0872-40df-9736-67661d3ccf48.png">
 
-### 3. License
+## 4. License
 
 ```
 MIT License

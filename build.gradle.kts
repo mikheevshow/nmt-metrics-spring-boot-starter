@@ -24,26 +24,20 @@ SOFTWARE.
 
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.lang.System.getenv
 import java.util.Properties
 
 plugins {
-    kotlin("jvm") version "1.7.10"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.7.10"
-    id("io.spring.dependency-management") version "1.1.0"
+    kotlin("jvm") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.2.21"
     `maven-publish`
     signing
 }
 
 group = "io.github.mikheevshow"
-version = "1.0.0"
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:2.7.8")
-    }
-}
+version = "2.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -51,14 +45,13 @@ repositories {
 }
 
 dependencies {
-
-    compileOnly("org.springframework.boot:spring-boot")
-    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    compileOnly("org.slf4j:slf4j-api:2.0.6")
-    compileOnly("io.micrometer:micrometer-registry-prometheus:1.10.3")
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${findProperty("bootVersion") ?: "4.0.9"}"))
+    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:${findProperty("bootVersion") ?: "4.0.9"}"))
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testApi("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("io.mockk:mockk:1.13.4")
@@ -77,12 +70,12 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
 
 java {

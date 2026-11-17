@@ -26,43 +26,43 @@ SOFTWARE.
 
 package io.github.mikheevshow.nmt.metrics
 
-import io.prometheus.client.Collector
-import io.prometheus.client.GaugeMetricFamily
+import io.prometheus.metrics.model.registry.MultiCollector
+import io.prometheus.metrics.model.snapshots.GaugeSnapshot
+import io.prometheus.metrics.model.snapshots.MetricSnapshots
 
 open class JvmNativeMemoryTrackingMetricsCollector(
     private val nameDescriptions: JvmNativeMemoryTrackingMetricsNameDescriptions,
     private val parser: JvmNativeMemoryTrackingParser,
     private val commandLineExecutor: CommandLineExecutor,
-) : Collector() {
-
+) : MultiCollector {
     private val log = logger()
 
-    override fun collect(): MutableList<MetricFamilySamples> {
-        try {
-
-            val nmt = commandLineExecutor.getNmtSummary()
-            val metricsMap = parser.parse(nmt)
-
-            return metricsMap
-                .asSequence()
-                .map {
-                    val metricName = "${NATIVE_MEMORY_TRACKING_PREFIX}_${it.key.replace(".", "_").replace("-", "_")}"
+    override fun collect(): MetricSnapshots {
+        return try {
+            val metrics = parser.parse(commandLineExecutor.getNmtSummary()).mapNotNull { (key, value) ->
+                val originalName = "${NATIVE_MEMORY_TRACKING_PREFIX}_${key.replace(".", "_").replace("-", "_")}"
+                // These values are gauges, and Prometheus reserves _total for counters.
+                val metricName = if (originalName.endsWith("_total")) originalName.removeSuffix("_total") + "_count" else originalName
+                val number = value.toString().toDoubleOrNull()
+                if (number == null) {
+                    null
+                } else {
                     try {
-                        GaugeMetricFamily(
-                            metricName,
-                            nameDescriptions.getOrEmpty(metricName),
-                            it.value.toString().toDouble()
-                        )
-                    } catch (ex: Exception) {
-                        log.trace(ex) { "Can't convert the metric with key $metricName to double, because value is ${it.value}" }
+                        GaugeSnapshot.builder()
+                            .name(metricName)
+                            .help(nameDescriptions.getOrEmpty(originalName))
+                            .dataPoint(GaugeSnapshot.GaugeDataPointSnapshot.builder().value(number).build())
+                            .build()
+                    } catch (ex: IllegalArgumentException) {
+                        log.warn("Cannot export NMT metric {}", metricName, ex)
                         null
                     }
                 }
-                .filterNotNull()
-                .toMutableList()
+            }
+            MetricSnapshots(metrics)
         } catch (ex: Exception) {
             log.error("Error when collect NMT metrics", ex)
-            return mutableListOf()
+            MetricSnapshots(emptyList())
         }
     }
 
