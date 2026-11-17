@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml/badge.svg?style=flat)](https://github.com/mikheevshow/nmt-metrics-spring-boot-starter/actions/workflows/build.yml)
-[![Sonatype Central](https://img.shields.io/nexus/r/io.github.mikheevshow/nmt-metrics-spring-boot-starter?color=light%20green&label=Maven%20Central&server=https%3A%2F%2Fs01.oss.sonatype.org)](https://central.sonatype.com/namespace/io.github.mikheevshow)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mikheevshow/nmt-metrics-spring-boot-starter)](https://central.sonatype.com/artifact/io.github.mikheevshow/nmt-metrics-spring-boot-starter)
 
 ## Table of Contents
 
@@ -27,14 +27,14 @@ The starter runs the JVM diagnostic command through its platform MBean when the 
 
 The 2.x line targets Spring Boot 4.0 and 4.1, Java 17 or later, and Prometheus Java client 1.x. The starter includes Actuator and the Prometheus registry. Add a web starter to expose an HTTP endpoint.
 
-**Release status:** This branch builds `2.0.0-SNAPSHOT`; version 2.0 has not yet been published to Maven Central. The examples below require the snapshot to be available in a repository configured for your build, or locally. Once a 2.x release is published, replace the snapshot version with that release.
+**Release status:** Version 2.0.0 is being prepared and is not yet published to Maven Central. Until it is released, the examples below require the artifact to be installed locally or available in another repository configured for your build.
 
 Gradle (Kotlin DSL):
 
 ```kotlin
-// Include mavenLocal() in repositories if you installed the snapshot locally.
+// Include mavenLocal() in repositories if you installed the release locally.
 implementation("org.springframework.boot:spring-boot-starter-webmvc")
-implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:2.0.0-SNAPSHOT")
+implementation("io.github.mikheevshow:nmt-metrics-spring-boot-starter:2.0.0")
 ```
 
 Maven:
@@ -48,7 +48,7 @@ Maven:
   <dependency>
     <groupId>io.github.mikheevshow</groupId>
     <artifactId>nmt-metrics-spring-boot-starter</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
   </dependency>
 </dependencies>
 ```

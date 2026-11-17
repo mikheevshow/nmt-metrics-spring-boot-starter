@@ -26,7 +26,6 @@ SOFTWARE.
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.lang.System.getenv
 import java.util.Properties
 
 plugins {
@@ -37,7 +36,7 @@ plugins {
 }
 
 group = "io.github.mikheevshow"
-version = "2.0.0-SNAPSHOT"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -83,26 +82,16 @@ java {
     withSourcesJar()
 }
 
-ext["ossrhUsername"] = null
-ext["ossrhPassword"] = null
-ext["sonatypeStagingProfileId"] = null
 ext["signing.keyId"] = null
 ext["signing.password"] = null
 ext["signing.key"] = null
 
 val secretPropsFile = project.file("local.properties")
 if (secretPropsFile.exists()) {
-    secretPropsFile.reader().use {
-        val props = Properties()
-        props.load(it)
-        props
-    }.onEach { (name, value) ->
-        ext[name.toString()] = value
-    }
+    secretPropsFile.reader().use { reader ->
+        Properties().apply { load(reader) }
+    }.onEach { (name, value) -> ext[name.toString()] = value }
 } else {
-    ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-    ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
-    ext["sonatypeStagingProfileId"] = System.getenv("SONATYPE_STAGING_PROFILE_ID")
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
     ext["signing.key"] = System.getenv("SIGNING_KEY")
@@ -110,19 +99,16 @@ if (secretPropsFile.exists()) {
 
 fun getExtraString(name: String) = ext[name]?.toString()
 
+val centralStagingDir = layout.buildDirectory.dir("central-staging")
+val cleanCentralStaging by tasks.registering(Delete::class) {
+    delete(centralStagingDir)
+}
+
 publishing {
     repositories {
         maven {
-            name = "sonatype"
-            url = if (version.toString().endsWith("SNAPSHOT")) {
-                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            } else {
-                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            }
-            credentials {
-                username = getExtraString("ossrhUsername")
-                password = getExtraString("ossrhPassword")
-            }
+            name = "centralBundle"
+            url = centralStagingDir.get().asFile.toURI()
         }
     }
 
@@ -172,4 +158,18 @@ signing {
 
     )
     sign(publishing.publications)
+}
+
+tasks.named("publishMavenJavaPublicationToCentralBundleRepository") {
+    dependsOn(cleanCentralStaging)
+}
+
+tasks.register<Zip>("centralBundle") {
+    description = "Build a signed bundle for manual upload to the Central Publisher Portal."
+    group = "publishing"
+    dependsOn("publishMavenJavaPublicationToCentralBundleRepository")
+    from(centralStagingDir)
+    exclude("**/maven-metadata.xml*")
+    destinationDirectory.set(layout.buildDirectory.dir("central-bundle"))
+    archiveFileName.set("${project.name}-${project.version}-central.zip")
 }
